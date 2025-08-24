@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: MIT-0
+---
+# defaults file for mariadb_backup_restore
+
+# mariadb_backup_restore_host: localhost
+# mariadb_backup_restore_login_unix_socket:
+# mariadb_backup_restore_login_port:
+# mariadb_backup_restore_user: root
+mariadb_backup_restore_password: "{{ mariadb_config_root_password }}" # root password for mariadb or mysql
+
+mariadb_backup_restore_retention: 7d
+
+# Folder to store dumps in
+mariadb_backup_restore_folder_backup: "/srv/mariadb_backup" # folder to store dumps
+
+# List of databases to back up
+# mariadb_backup_restore_db_list_backup:
+#   - dbname: exampledb
+#     filename: exampledb
+#     format: sql.gz
+#   - dbname: exampledb2
+#     filename: exampledb2
+#     format: sql.gz
+
+# Folder to fetch dumps from
+mariadb_backup_restore_folder_restore: "{{ mariadb_backup_restore_folder_backup }}" # folder containing dumps to restore
+
+# If you want to restore to the latest backup of the following dump, uncomment and customize this
+# mariadb_backup_restore_db_restore:
+#   dbname: exampledb
+#   filename: exampledb
+#   format: sql.gz
+
+# If you want to restore from a specific file, uncomment and customize this
+# mariadb_backup_restore_db_restore_specific:
+#   dbname: exampledb
+#   fullname: exampledb-2025-08-24T06:05:11Z.sql.gz
+...

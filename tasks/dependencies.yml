@@ -1,0 +1,9 @@
+---
+- name: Install dependencies
+  ansible.builtin.package:
+    name:
+      - mariadb-client-utils
+      - python3-PyMySQL
+      - gzip
+    state: present
+...

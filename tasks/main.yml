@@ -1,0 +1,42 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for mariadb_backup_restore
+
+- name: Install dependencies
+  ansible.builtin.include_tasks: dependencies.yml
+  tags: dependencies
+  args:
+    apply:
+      tags:
+        - dependencies
+
+- name: Back up mariadb databases
+  ansible.builtin.include_tasks: backup.yml
+  tags: backup
+  args:
+    apply:
+      tags:
+        - backup
+
+- name: Restore mariadb databases
+  ansible.builtin.include_tasks: restore.yml
+  when:
+    - mariadb_backup_restore_db_restore is defined or
+      mariadb_backup_restore_db_restore_specific is defined and
+      mariadb_backup_restore_folder_restore is defined
+  tags: never, restore
+  args:
+    apply:
+      tags:
+        - never
+        - restore
+
+- name: Prune dumps
+  ansible.builtin.include_tasks: prune.yml
+  tags: never, prune
+  args:
+    apply:
+      tags:
+        - never
+        - prune
+...

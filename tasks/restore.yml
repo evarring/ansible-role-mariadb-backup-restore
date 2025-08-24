@@ -1,0 +1,39 @@
+---
+- name: If specific dump not selected, pick latest
+  when: mariadb_backup_restore_db_restore_specific is not defined
+  block:
+    - name: List dumps
+      ansible.builtin.find:
+        paths: "{{ mariadb_backup_restore_folder_restore }}"
+        patterns: "{{ mariadb_backup_restore_db_restore.filename }}-*.{{ mariadb_backup_restore_db_restore.format }}"
+        recurse: false
+      register: list_backups
+
+    - name: Pick the newest backup file
+      ansible.builtin.set_fact:
+        newest_list_backup: "{{ (list_backups.files | sort(attribute='mtime') | last).path }}"
+      when: list_backups.matched > 0
+
+    - name: Show which file was selected
+      ansible.builtin.debug:
+        msg: "Newest backup is {{ newest_list_backup }}"
+      when: list_backups.matched > 0
+
+- name: Set full path if specific defined
+  ansible.builtin.set_fact:
+    mariadb_backup_restore_specific_full_path: "{{ mariadb_backup_restore_folder_backup }}/{{ mariadb_backup_restore_db_restore_specific.fullname }}"
+  when: mariadb_backup_restore_db_restore_specific is defined
+
+- name: Import MariaDB or MySQL databases
+  community.mysql.mysql_db:
+    name: "{{ mariadb_backup_restore_db_restore_specific.dbname | default(mariadb_backup_restore_db_restore.dbname) }}"
+    target: "{{ mariadb_backup_restore_specific_full_path | default(newest_list_backup) }}"
+    login_host: "{{ mariadb_backup_restore_host | default(omit) }}"
+    login_unix_socket: "{{ mariadb_backup_restore_login_unix_socket | default(omit) }}"
+    login_port: "{{ mariadb_backup_restore_login_port | default(omit) }}"
+    login_user: "{{ mariadb_backup_restore_login_user | default('root') }}"
+    login_password: "{{ mariadb_backup_restore_password }}"
+    state: import
+    use_shell: true
+    force: true
+...

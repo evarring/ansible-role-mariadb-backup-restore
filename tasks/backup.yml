@@ -1,0 +1,13 @@
+---
+- name: Dump databases
+  community.mysql.mysql_db:
+    name: "{{ item.dbname }}"
+    target: "{{ mariadb_backup_restore_folder_backup }}/{{ item.filename }}-{{ ansible_date_time.iso8601 }}.{{ item.format }}"
+    login_host: "{{ mariadb_backup_restore_host | default(omit) }}"
+    login_unix_socket: "{{ mariadb_backup_restore_login_unix_socket | default(omit) }}"
+    login_port: "{{ mariadb_backup_restore_login_port | default(omit) }}"
+    login_user: "{{ mariadb_backup_restore_login_user | default('root') }}"
+    login_password: "{{ mariadb_backup_restore_password }}"
+    state: dump
+  loop: "{{ mariadb_backup_restore_db_list_backup }}"
+...
